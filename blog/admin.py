@@ -4,7 +4,7 @@ from .models import Post
 
 
 
-#Creates site based on Post class in models
+
 
 #Information on how to display model information
 class PostAdmin(admin.ModelAdmin):
@@ -17,6 +17,8 @@ class PostAdmin(admin.ModelAdmin):
     date_hierarchy = 'publish'
     ordering = ['status','publish']
 
+
+#Creates site based on Post class in models
 admin.site.register(Post,PostAdmin)
 
 
