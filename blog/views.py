@@ -5,6 +5,8 @@ from django.views.generic import ListView
 from django.core.mail import send_mail
 from .models import Post,Comment
 from .forms import EmailPostForm,CommentForm
+from taggit.models import Tag
+from django.db.models import Count
 
 # Create your views here.
 class PostListView(ListView):
@@ -14,8 +16,12 @@ class PostListView(ListView):
     template_name = 'blog/post/list.html'
 
 #View that displays all published posts
-def post_list(request):
+def post_list(request,tag_slug=None):
     object_list = Post.published.all()
+    tag=None
+    if tag_slug:
+        tag = get_object_or_404(Tag,slug=tag_slug)
+        object_list=object_list.filter(tags__in=[tag])
     paginator = Paginator(object_list,3) #3 posts per page
     page = request.GET.get('page')
     try:
@@ -28,7 +34,8 @@ def post_list(request):
         posts = paginator.page(paginator.num_pages)
     return render(request,
                   'blog/post/list.html',
-                  {'page':page,'post':posts})
+                  {'page':page,'post':posts,
+                   'tag':tag})
 
 #View that displays a single post
 def post_detail(request,year,month,day,post):
@@ -53,11 +60,18 @@ def post_detail(request,year,month,day,post):
             new_comment.save()
     else:
         comment_form=CommentForm()
+    #List of similar posts
+    post_tags_ids=post.tags.values_list('id',flat=True)
+    similar_posts=Post.published.filter(tags__in=post_tags_ids)\
+                                        .exclude(id=post.id)
+    similar_posts = similar_posts.annotate(same_tags=Count('tags'))\
+                                            .order_by('-same_tags','-publish')[:4]
     return render(request,
                   'blog/post/detail.html',
                   {'post':post,
                    'comments':comments,
-                   'comment_form':comment_form})
+                   'comment_form':comment_form,
+                   'similar_posts':similar_posts})
 
 #View for form
 def post_share(request,post_id):

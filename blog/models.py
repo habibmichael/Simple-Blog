@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from taggit.managers import TaggableManager
 
 
 #Custom Model Manager for querying by published posts
@@ -33,6 +34,7 @@ class Post(models.Model):
                               default='draft')
     objects = models.Manager() #default manager
     published = PublishedManager() #custom manager
+    tags = TaggableManager() #Tag manager
     #method for canonical urls
     def get_absolute_url(self):
         return reverse('blog:post_detail',
@@ -64,3 +66,6 @@ class Comment(models.Model):
 
     def __str__(self):
         return 'Comment by {} on {}'.format(self.name,self.post)
+
+
+
