@@ -34,7 +34,7 @@ def post_list(request,tag_slug=None):
         posts = paginator.page(paginator.num_pages)
     return render(request,
                   'blog/post/list.html',
-                  {'page':page,'post':posts,
+                  {'page':page,'posts':posts,
                    'tag':tag})
 
 #View that displays a single post
