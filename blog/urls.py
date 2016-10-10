@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^sitemap\.xml$',sitemap,{'sitemaps':sitemaps},
         name='django.contrib.sitemaps.views.sitemap'),
     url(r'^feed/$',LatestPostsFeed(),name='post_feed'),
+    url(r'^search/$',views.post_search,name='post_search'),
 ]
